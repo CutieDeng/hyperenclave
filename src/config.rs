@@ -24,6 +24,7 @@ const HV_MAX_IOMMU_UNITS: usize = 16;
 const HV_MAX_RMRR_RANGE: usize = 4;
 
 #[derive(Debug)]
+#[derive(Clone, Copy)]
 #[repr(C, packed)]
 pub struct HvMemoryRegion {
     pub phys_start: u64,
@@ -33,6 +34,7 @@ pub struct HvMemoryRegion {
 }
 
 #[derive(Debug)]
+#[derive(Clone, Copy)]
 #[repr(C, packed)]
 pub struct HvIommuInfo {
     pub base: u64,
@@ -40,6 +42,7 @@ pub struct HvIommuInfo {
 }
 
 #[derive(Debug)]
+#[derive(Clone, Copy)]
 #[repr(C, packed)]
 pub struct HvRmrrRange {
     pub base: u64,
@@ -49,12 +52,14 @@ pub struct HvRmrrRange {
 #[cfg(target_arch = "x86_64")]
 #[derive(Debug)]
 #[repr(C, packed)]
+#[derive(Clone, Copy)]
 struct ArchPlatformInfo {
     iommu_units: [HvIommuInfo; HV_MAX_IOMMU_UNITS],
     rmrr_ranges: [HvRmrrRange; HV_MAX_RMRR_RANGE],
 }
 
 #[derive(Debug)]
+#[derive(Clone, Copy)] 
 #[repr(C, packed)]
 struct PlatformInfo {
     arch: ArchPlatformInfo,

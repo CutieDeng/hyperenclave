@@ -32,6 +32,8 @@ use crate::memory::addr::{virt_to_phys, GuestVirtAddr};
 use crate::memory::{GenericPageTable, MemFlags, MemoryRegion, MemorySet};
 use crate::stats::Instant;
 
+use core::arch::asm; 
+
 pub const PER_CPU_SIZE: usize = size_of::<PerCpu>();
 
 static ACTIVATED_CPUS: AtomicIsize = AtomicIsize::new(0);

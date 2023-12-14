@@ -22,6 +22,8 @@ use crate::error::HvResult;
 use crate::percpu::CpuState;
 use crate::stats::Instant;
 
+use core::arch::asm; 
+
 impl VmExit<'_> {
     fn handle_nmi(&mut self) -> HvResult {
         unsafe { asm!("cli; stgi; clgi; sti") };

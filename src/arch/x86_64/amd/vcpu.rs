@@ -14,6 +14,8 @@
 
 use core::fmt::{Debug, Formatter, Result};
 
+use core::arch::asm; 
+
 use libvmm::msr::Msr;
 use libvmm::svm::flags::{InterruptType, VmcbCleanBits, VmcbIntInfo, VmcbTlbControl};
 use libvmm::svm::{vmcb::VmcbSegment, SvmExitCode, SvmIntercept, Vmcb};
@@ -127,7 +129,7 @@ impl Vcpu {
                 in(reg) regs as * const _ as usize,
                 sym svm_run,
                 options(noreturn),
-            );
+            )
         }
     }
 
@@ -263,7 +265,8 @@ impl Vcpu {
         // We should load the following register state manually since we not use VMLOAD/VMSAVE
         linux.fs.selector = segmentation::fs();
         linux.gs.selector = segmentation::gs();
-        linux.tss.selector = task::tr();
+        // [[debug]]
+        linux.tss.selector = unsafe { task::tr() }; 
         linux.fs.base = Msr::IA32_FS_BASE.read();
         linux.gs.base = Msr::IA32_GS_BASE.read();
     }
@@ -330,12 +333,17 @@ impl Debug for Vcpu {
             .field("guest_regs", &self.guest_regs)
             .field("rip", &self.instr_pointer())
             .field("rsp", &self.stack_pointer())
-            .field("rflags", unsafe {
-                &RFlags::from_bits_unchecked(self.rflags())
+            // .field("rflags", unsafe {
+            //     &RFlags::from_bits_unchecked(self.rflags())
+            // })
+            .field("rflags", {
+                &RFlags::from_bits_retain(self.rflags())
             })
-            .field("cr0", unsafe { &Cr0Flags::from_bits_unchecked(self.cr(0)) })
+            // .field("cr0", unsafe { &Cr0Flags::from_bits_unchecked(self.cr(0)) })
+            .field("cr0", &Cr0Flags::from_bits_retain(self.cr(0)))
             .field("cr3", &self.cr(3))
-            .field("cr4", unsafe { &Cr4Flags::from_bits_unchecked(self.cr(4)) })
+            // .field("cr4", unsafe { &Cr4Flags::from_bits_unchecked(self.cr(4)) })
+            .field("cr4", &Cr4Flags::from_bits_retain(self.cr(4)))
             .field("cs", &self.vmcb.save.cs)
             .finish()
     }
@@ -358,5 +366,5 @@ unsafe extern "sysv64" fn svm_run() -> ! {
         sym crate::arch::vmm::vmexit_handler,
         sym svm_run,
         options(noreturn),
-    );
+    )
 }

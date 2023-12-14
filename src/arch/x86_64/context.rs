@@ -147,7 +147,8 @@ impl LinuxContext {
             es: Segment::from_selector(segmentation::es(), &gdt),
             fs,
             gs,
-            tss: Segment::from_selector(task::tr(), &gdt),
+            // Debug!!! 
+            tss: unsafe { Segment::from_selector(task::tr(), &gdt) }, 
             gdt,
             idt: IDTStruct::sidt(),
             cr0: Cr0::read(),
@@ -226,6 +227,7 @@ impl LinuxContext {
 
 impl GuestRegisters {
     pub fn return_to_linux(&self, linux: &LinuxContext) -> ! {
+        use core::arch::asm; 
         unsafe {
             asm!(
                 "mov rsp, {linux_rsp}",
@@ -241,7 +243,7 @@ impl GuestRegisters {
                 guest_regs = in(reg) self,
                 guest_regs_size = const core::mem::size_of::<Self>(),
                 options(noreturn),
-            );
+            )
         }
     }
 }

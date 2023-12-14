@@ -16,6 +16,7 @@ use bitflags::bitflags;
 
 use super::context::GuestRegisters;
 
+use core::arch::global_asm; 
 global_asm!(include_str!(concat!(env!("OUT_DIR"), "/exception.S")));
 
 #[allow(dead_code)]
@@ -160,9 +161,11 @@ fn handle_page_fault(frame: &ExceptionFrame) {
     );
 }
 
+use core::arch::asm; 
+
 #[naked]
 #[no_mangle]
-#[inline(never)]
+// #[inline(never)]
 unsafe extern "sysv64" fn common_exception_entry() -> ! {
     asm!(
         save_regs_to_stack!(),
@@ -173,5 +176,5 @@ unsafe extern "sysv64" fn common_exception_entry() -> ! {
         "iretq",
         sym exception_handler,
         options(noreturn),
-    );
+    )
 }

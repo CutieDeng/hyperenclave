@@ -20,7 +20,7 @@ travis-ci = { repository = "yogcrypt/yogcrypt", branch = "master" }
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
 
 [dev-dependencies]
-criterion = "0.2"
+criterion = "0"
 
 [[bench]]
 name = "yogcrypt_benchmarks"

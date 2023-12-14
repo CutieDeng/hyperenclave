@@ -336,12 +336,14 @@ impl Enclave {
             );
         }
 
-        if !page_desc.attr.contains(EnclPageAttributes::EADD) {
+        let attr = page_desc.attr; 
+        if !attr.contains(EnclPageAttributes::EADD) {
+            let attr = page_desc.attr; 
             return hypercall_hv_err_result!(
                 EINVAL,
                 format!(
                     "Enclave::add_page(): Bad page attributes {:#x?}",
-                    page_desc.attr
+                    attr, 
                 )
             );
         }
@@ -403,8 +405,8 @@ impl Enclave {
                 PAGE_SIZE,
             );
         }
-
-        let page_data = if page_desc.attr.contains(EnclPageAttributes::EEXTEND) {
+        let attr = page_desc.attr; 
+        let page_data = if attr.contains(EnclPageAttributes::EEXTEND) {
             Some(unsafe { &*(phys_to_virt(gpaddr) as *mut [u8; PAGE_SIZE]) })
         } else {
             None
@@ -740,11 +742,15 @@ impl Enclave {
 
         let nonce = va_slot.get();
         let time_nonce = now.elapsed();
-        let mut alg = reclaim::create_alg_instance(&nonce, self.id, &metadata.sec_info, gvaddr);
-        alg.decrypt_and_hmac_page(gpaddr_src, gpaddr_dst, &metadata.mac)?;
+        let sec_info = metadata.sec_info; 
+        let mut alg = reclaim::create_alg_instance(&nonce, self.id, &sec_info, gvaddr);
+        let mac = metadata.mac; 
+        // [debug!!!]
+        let _ = alg.decrypt_and_hmac_page(gpaddr_src, gpaddr_dst, &mac); 
         let time_dec_and_hmac = now.elapsed();
 
-        EpcmManager::add_page(gvaddr, gpaddr_dst, &metadata.sec_info, self)?;
+        let sec_info = metadata.sec_info; 
+        EpcmManager::add_page(gvaddr, gpaddr_dst, &sec_info, self)?;
         let time_add_page = now.elapsed();
 
         let gpt_flags = metadata.sec_info.into();

@@ -96,7 +96,9 @@ impl Cell {
                 region.size as usize,
                 region.flags - MemFlags::ENCRYPTED, // guest should not read decrypted data
             );
-            if region.flags.contains(MemFlags::DMA) {
+            // [[debug]]
+            let flags = region.flags; 
+            if flags.contains(MemFlags::DMA) {
                 dma_regions.insert(r.clone())?;
             } else {
                 for rmrr_range in sys_config.rmrr_ranges() {
@@ -138,14 +140,16 @@ impl Cell {
         ))?;
         println!("tpm mmio is mapped va={:#x}", header.tpm_mmio_pa);
         for region in sys_config.mem_regions() {
-            if region.flags.contains(MemFlags::DMA) {
+            let flags = region.flags; 
+            if flags.contains(MemFlags::DMA) {
                 let hv_virt_start = phys_to_virt(region.virt_start as GuestPhysAddr);
+                let virt_start = region.virt_start; 
                 if hv_virt_start < region.virt_start as GuestPhysAddr {
                     return hv_result_err!(
                         EINVAL,
                         format!(
                             "Guest physical address {:#x} is too large",
-                            region.virt_start
+                            virt_start
                         )
                     );
                 }

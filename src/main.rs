@@ -15,12 +15,12 @@
 #![cfg_attr(not(test), no_std)]
 #![cfg_attr(not(test), no_main)]
 #![cfg_attr(test, allow(dead_code))]
-#![feature(asm)]
-#![feature(lang_items)]
-#![feature(global_asm)]
+// #![feature(lang_items)]
 #![feature(concat_idents)]
 #![feature(naked_functions)]
-#![allow(unaligned_references)]
+// #![allow(unaligned_references)]
+
+#![feature(asm_const)]
 
 #[macro_use]
 extern crate alloc;

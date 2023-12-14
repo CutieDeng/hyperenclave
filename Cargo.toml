@@ -28,7 +28,8 @@ bitflags = "1.2"
 bit_field = "0.10"
 numeric-enum-macro = "0.2"
 buddy_system_allocator = "0.5"
-libvmm = { path = "./crates/libvmm", default-features = false }
+# libvmm = { path = "./crates/libvmm", default-features = false }
+libvmm = { path = "./crates/libvmm" } 
 uart_16550 = { path = "./crates/uart_16550" }
 lazy_static = { version = "1.4", features = ["spin_no_std"] }
 bitmap-allocator = { git = "https://github.com/rcore-os/bitmap-allocator", rev = "03bd9909" }
@@ -40,6 +41,6 @@ static_assertions = "1.1.0"
 memoffset = "0.8"
 
 [target.'cfg(target_arch = "x86_64")'.dependencies]
-x86 = "0.34"
+x86 = "0"
 x86_64 = "0.14"
 raw-cpuid = "10.6"

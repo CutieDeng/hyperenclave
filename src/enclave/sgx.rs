@@ -615,9 +615,11 @@ impl Default for SigStruct {
 
 impl Debug for SgxPcmd {
     fn fmt(&self, f: &mut Formatter) -> Result {
+        let mac = self.mac; 
+        let sec_info = self.sec_info; 
         f.debug_struct("SgxPcmd")
-            .field("sec_info", &self.sec_info)
-            .field("mac", &self.mac)
+            .field("sec_info", &sec_info)
+            .field("mac", &mac)
             .finish()
     }
 }

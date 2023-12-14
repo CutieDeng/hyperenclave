@@ -187,7 +187,7 @@ pub(crate) fn sm3_enc_inner(msg: &[u32], prim_len: usize) -> HashValue {
         // words' index in a block
         for j in 0..16 {
             if (i * 16 + j) < msg.len() {
-                b[j] = msg[(i * 16 + j)];
+                b[j] = msg[i * 16 + j];
             }
         }
 

@@ -17,8 +17,11 @@
 use core::convert::TryInto;
 
 use bit_field::BitField;
-use libvmm_macros::*;
+// use libvmm_macros::vmcs_access;
+
 use x86::{bits64::vmx, vmx::Result as VmResult};
+
+use libvmm_macros::vmcs_access;
 
 use super::definitions::{VmxExitReason, VmxInstructionError};
 use super::flags::{EptpFlags, InterruptInfo, InvEptType};

@@ -105,7 +105,7 @@ impl U64x4 {
             1 => (self.value[1] >> x) % 2,
             2 => (self.value[2] >> x) % 2,
             3 => (self.value[3] >> x) % 2,
-            _ => (panic!("unknown n")),
+            _ => panic!("unknown n"), 
         }
     }
 }

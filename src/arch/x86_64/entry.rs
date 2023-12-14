@@ -14,6 +14,8 @@
 
 use crate::percpu::PerCpu;
 
+use core::arch::asm; 
+
 unsafe extern "sysv64" fn switch_stack(cpu_id: usize, linux_sp: usize) -> i32 {
     let cpu_data = PerCpu::from_id(cpu_id);
     let hv_sp = cpu_data.stack_top();
@@ -59,5 +61,5 @@ pub unsafe extern "C" fn arch_entry(_cpu_id: usize) -> i32 {
         // rip will pop when return",
         sym switch_stack,
         options(noreturn),
-    );
+    )
 }

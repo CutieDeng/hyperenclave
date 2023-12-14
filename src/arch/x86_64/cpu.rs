@@ -42,6 +42,8 @@ pub fn check_cpuid() -> HvResult {
 #[allow(dead_code)]
 const CACHE_LINE_SIZE: usize = 64;
 
+use core::arch::asm; 
+
 #[allow(dead_code)]
 pub fn clflush_cache_range(vaddr: usize, length: usize) {
     // clflush is an unordered instruction which needs fencing with mfence or

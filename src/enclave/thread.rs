@@ -105,7 +105,7 @@ impl EnclaveThread {
         let ssa = ssa_ptr.as_mut()?;
         let ssa_paddr = GuestPtr::ref_to_gpaddr(ssa);
 
-        let mut gpr = &mut ssa.gpr;
+        let gpr = &mut ssa.gpr;
 
         let time_get_ssa = now.elapsed();
 
@@ -173,7 +173,7 @@ impl EnclaveThread {
         let ssa_paddr = GuestPtr::ref_to_gpaddr(ssa);
         let time_get_ssa = now.elapsed();
 
-        let mut ssa_misc = &mut ssa.misc;
+        let ssa_misc = &mut ssa.misc;
         if (ssa_misc.exinfo.errcd & EnclavePFErrorCode::SHARED_MEM_FETCH.bits()) != 0 {
             let fault_gvaddr = ssa_misc.exinfo.maddr as usize;
             let start_addr = align_down(fault_gvaddr);

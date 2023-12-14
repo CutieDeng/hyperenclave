@@ -20,6 +20,8 @@ use x86_64::structures::gdt::{Descriptor, DescriptorFlags};
 use x86_64::structures::idt::{Entry, HandlerFunc, InterruptDescriptorTable};
 use x86_64::structures::{tss::TaskStateSegment, DescriptorTablePointer};
 
+use core::arch::asm; 
+
 use super::segmentation::SegmentAccessRights;
 
 const TSS: TaskStateSegment = TaskStateSegment::new();

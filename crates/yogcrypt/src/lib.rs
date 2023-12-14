@@ -29,7 +29,6 @@
 
 #![no_std]
 #![feature(core_intrinsics)]
-#![feature(global_asm)]
 #![allow(unused_doc_comments)]
 #![allow(dead_code)]
 // make the linter allow the following usage

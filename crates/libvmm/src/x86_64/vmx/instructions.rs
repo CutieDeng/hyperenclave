@@ -40,6 +40,8 @@ fn vmx_capture_status() -> Result<()> {
     }
 }
 
+use core::arch::asm; 
+
 /// Invalidate Translations Derived from EPT.
 ///
 /// # Safety

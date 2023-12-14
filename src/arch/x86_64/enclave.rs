@@ -248,7 +248,7 @@ impl EnclaveThreadState {
         normal_world_state: &Self,
     ) -> HvResult {
         let regs = vcpu.regs();
-        let mut gpr = &mut ssa.gpr;
+        let gpr = &mut ssa.gpr;
         gpr.rax = regs.rax;
         gpr.rcx = regs.rcx;
         gpr.rdx = regs.rdx;
@@ -272,7 +272,7 @@ impl EnclaveThreadState {
         gpr.gs_base = vcpu.gs_base();
 
         if let Some(misc_in) = aex_excep.misc {
-            let mut ssa_misc = &mut ssa.misc;
+            let ssa_misc = &mut ssa.misc;
             ssa_misc.exinfo.maddr = misc_in.exinfo.maddr;
             ssa_misc.exinfo.errcd = misc_in.exinfo.errcd;
         }

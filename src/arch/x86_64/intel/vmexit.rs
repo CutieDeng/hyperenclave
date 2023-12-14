@@ -25,6 +25,8 @@ use crate::error::HvResult;
 use crate::percpu::CpuState;
 use crate::stats::Instant;
 
+use core::arch::asm; 
+
 impl VmExit<'_> {
     fn handle_exception_nmi(&mut self, exit_info: &VmExitInfo) -> HvResult {
         let intr_info = ExitInterruptInfo::new()?;

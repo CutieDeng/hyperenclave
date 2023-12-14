@@ -484,12 +484,17 @@ impl Debug for Vcpu {
                 .field("guest_regs", &self.guest_regs)
                 .field("rip", &self.instr_pointer())
                 .field("rsp", &self.stack_pointer())
-                .field("rflags", unsafe {
-                    &RFlags::from_bits_unchecked(self.rflags())
+                // .field("rflags", unsafe {
+                //     &RFlags::from_bits_unchecked(self.rflags())
+                // })
+                .field("rflags", {
+                    &RFlags::from_bits_retain(self.rflags())
                 })
-                .field("cr0", unsafe { &Cr0Flags::from_bits_unchecked(self.cr(0)) })
+                // .field("cr0", unsafe { &Cr0Flags::from_bits_unchecked(self.cr(0)) })
+                .field("cr0", { &Cr0Flags::from_bits_retain(self.cr(0)) })
                 .field("cr3", &self.cr(3))
-                .field("cr4", unsafe { &Cr4Flags::from_bits_unchecked(self.cr(4)) })
+                // .field("cr4", unsafe { &Cr4Flags::from_bits_unchecked(self.cr(4)) })
+                .field("cr4", { &Cr4Flags::from_bits_retain(self.cr(4)) })
                 .field("cs", &VmcsField16Guest::CS_SELECTOR.read()?)
                 .field("fs_base", &VmcsField64Guest::FS_BASE.read()?)
                 .field("gs_base", &VmcsField64Guest::GS_BASE.read()?)
@@ -499,6 +504,8 @@ impl Debug for Vcpu {
         .unwrap()
     }
 }
+
+use core::arch::asm; 
 
 #[naked]
 unsafe extern "sysv64" fn vmx_exit() -> ! {

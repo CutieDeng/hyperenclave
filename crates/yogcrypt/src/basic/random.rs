@@ -18,6 +18,8 @@ use core::cmp;
 use core::fmt;
 use core::mem;
 
+use core::arch::global_asm; 
+
 global_asm!(include_str!("rand.S"), options(att_syntax));
 
 #[inline]

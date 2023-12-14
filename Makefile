@@ -39,6 +39,9 @@ define format-check-rust
 		fi
 endef
 
+# VENDOR ?= intel
+# SME ?= off
+
 ARCH ?= x86_64
 VENDOR ?= amd
 LOG ?=
