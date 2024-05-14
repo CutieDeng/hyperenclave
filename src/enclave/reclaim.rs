@@ -54,6 +54,7 @@ lazy_static! {
         get_random(&mut seed);
         unsafe { transmute::<[u8; RECLAIM_NONCE_LEN], u64>(seed) }
     };
+    // ??? 
     pub static ref CRYPTO_ALG: CryptoAlgType = get_crypto_alg();
 }
 
@@ -83,7 +84,9 @@ pub fn get_crypto_alg() -> CryptoAlgType {
 }
 
 pub fn init() {
+    // ???????????? 
     lazy_static::initialize(&CRYPTO_ALG);
+
     NONCE_VAL.store(*NONCE_SEED, Ordering::Release);
 }
 

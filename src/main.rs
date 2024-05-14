@@ -75,7 +75,9 @@ fn has_err() -> bool {
     ERROR_NUM.load(Ordering::Acquire) != 0
 }
 
+// 初始化的 barrier 
 fn wait_for_other_completed(counter: &AtomicUsize, max_value: usize) -> HvResult {
+    //????????
     while !has_err() && counter.load(Ordering::Acquire) < max_value {
         core::hint::spin_loop();
     }
@@ -118,8 +120,11 @@ fn primary_init_early() -> HvResult {
     info!("Hypervisor header: {:#x?}", HvHeader::get());
     debug!("System config: {:#x?}", system_config);
 
+    // 就为了初始化一个变量 ?? 
     reclaim::init();
+
     memory::init()?;
+
     cell::init()?;
 
     INIT_EARLY_OK.store(1, Ordering::Release);

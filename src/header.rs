@@ -63,7 +63,8 @@ pub struct HvHeader {
 
 impl HvHeader {
     pub fn get() -> &'static Self {
-        unsafe { &*HEADER_PTR }
+        HEADER_PTR
+        // unsafe { &*HEADER_PTR }
     }
 }
 

@@ -69,7 +69,8 @@ target_elf   := $(build_path)/$(elf_name)
 target_bin   := $(build_path)/$(elf_name).bin
 install_path := /lib/firmware/$(elf_name)-$(VENDOR)
 
-rust_flags="-C code-model=medium"
+# rust_flags="-C code-model=medium"
+# rust_flags="-C code-model="
 
 ifeq ($(ARCH), x86_64)
   features := $(VENDOR)
