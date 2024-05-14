@@ -15,6 +15,7 @@
 use alloc::string::String;
 use core::fmt::{Debug, Formatter, Result};
 
+
 /// POSIX errno
 #[repr(u32)]
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -34,6 +35,7 @@ pub enum HvErrorNum {
     ENOSYS = 38,
 }
 
+// 不能理解的行为，Error 类型居然存 Debug 信息... 
 pub struct HvError {
     num: HvErrorNum,
     loc_file: &'static str,

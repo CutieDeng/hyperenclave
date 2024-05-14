@@ -45,12 +45,19 @@ pub enum CpuState {
     EnclaveRunning,
 }
 
+/// PerCpu 定义了一个抽象机中的物理 cpu 
 #[repr(align(4096))]
 pub struct PerCpu {
+    /// 当前物理 cpu 标识
     pub cpu_id: usize,
+    /// cpu 状态：Hv 开启、关闭、运行
     pub state: CpuState,
+    /// vcpu 
     pub vcpu: Vcpu,
+    /// cpu 所使用的栈空间 
+    /// ? 为什么定义在这 
     stack: [usize; HV_STACK_SIZE / size_of::<usize>()],
+    /// 
     linux: LinuxContext,
     hvm: MemorySet<HostPageTable>,
     enclave_thread: EnclaveThread,
@@ -64,12 +71,14 @@ impl PerCpu {
         }
     }
 
-    pub fn from_id_mut<'a>(cpu_id: usize) -> &'a mut Self {
+    // 该抽象错误，将一个 usize 直接转换成一个无约束的引用... 
+    // 怎么就不舍得实现一个 Option 呢？
+    pub fn from_id_mut(cpu_id: usize) -> Option<&'static mut Self> { 
         unsafe {
-            &mut core::slice::from_raw_parts_mut(
+            core::slice::from_raw_parts_mut(
                 PER_CPU_ARRAY_PTR,
                 HvHeader::get().max_cpus as usize,
-            )[cpu_id]
+            ).get_mut(cpu_id)
         }
     }
 

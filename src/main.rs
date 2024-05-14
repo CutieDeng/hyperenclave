@@ -142,7 +142,7 @@ fn primary_init_late() -> HvResult {
 }
 
 fn main(cpu_id: usize, linux_sp: usize) -> HvResult {
-    let cpu_data = PerCpu::from_id_mut(cpu_id);
+    let cpu_data = unsafe { PerCpu::from_id_mut(cpu_id) }; 
     let online_cpus = HvHeader::get().online_cpus as usize;
     let is_primary = ENTERED_CPUS.fetch_add(1, Ordering::SeqCst) == 0;
     wait_for_other_completed(&ENTERED_CPUS, online_cpus)?;
@@ -182,7 +182,21 @@ fn restore_states(cpu_id: usize) {
     cpu_data.return_to_linux();
 }
 
+#[cfg(target_arch = "x86_64")]
 extern "sysv64" fn entry(cpu_id: usize, linux_sp: usize) -> i32 {
+    let mut code = 0;
+    if let Err(e) = main(cpu_id, linux_sp) {
+        error!("{:?}", e);
+        ERROR_NUM.store(e.code(), Ordering::Release);
+        code = e.code();
+    }
+    restore_states(cpu_id);
+    println!("CPU {} return back to driver with code {}.", cpu_id, code);
+    code
+}
+
+#[cfg(target_arch = "aarch64")]
+extern "C" fn entry(cpu_id: usize, linux_sp: usize) -> i32 {
     let mut code = 0;
     if let Err(e) = main(cpu_id, linux_sp) {
         error!("{:?}", e);
