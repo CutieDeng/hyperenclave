@@ -208,3 +208,25 @@ impl LinuxContext {
         }
     }
 }
+
+impl GuestRegisters {
+    pub fn return_to_linux(&self, linux: &LinuxContext) -> ! {
+        use core::arch::asm;
+        unsafe {
+            asm!(
+                "mov sp, {linux_sp}",
+                "ldr lr, {linux_pc}",
+                "mov x0, {guest_regs}",
+                "add x0, x0, {guest_regs_size}",
+                restore_regs_from_stack!(),
+                "ldr sp, [sp, #-8]!",
+                "ret",
+                linux_sp = in(reg) linux.sp,
+                linux_pc = in(reg) linux.pc,
+                guest_regs = in(reg) self as *const _ as u64,
+                guest_regs_size = const core::mem::size_of::<Self>(),
+                options(noreturn),
+            );
+        }
+    }
+}
