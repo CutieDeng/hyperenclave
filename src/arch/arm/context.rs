@@ -125,3 +125,86 @@ impl LinuxContext {
         }
     }
 }
+
+impl LinuxContext {
+    pub fn restore(&self) {
+        unsafe {
+            // 恢复控制寄存器和状态寄存器
+            asm!(
+                "
+                msr sp_el0, {0}
+                msr elr_el1, {1}
+                msr spsr_el1, {2}
+                msr ttbr0_el1, {3}
+                msr ttbr1_el1, {4}
+                msr tcr_el1, {5}
+                msr mair_el1, {6}
+                msr amair_el1, {7}
+                msr sctlr_el1, {8}
+                ",
+                in(reg) self.sp,
+                in(reg) self.pc,
+                in(reg) self.spsr_el1,
+                in(reg) self.ttbr0_el1,
+                in(reg) self.ttbr1_el1,
+                in(reg) self.tcr_el1,
+                in(reg) self.mair_el1,
+                in(reg) self.amair_el1,
+                in(reg) self.sctlr_el1,
+            );
+
+            // 恢复通用寄存器
+            asm!(
+                "
+                ldp x0, x1, [sp], #16
+                ldp x2, x3, [sp], #16
+                ldp x4, x5, [sp], #16
+                ldp x6, x7, [sp], #16
+                ldp x8, x9, [sp], #16
+                ldp x10, x11, [sp], #16
+                ldp x12, x13, [sp], #16
+                ldp x14, x15, [sp], #16
+                ldp x16, x17, [sp], #16
+                ldp x18, x19, [sp], #16
+                ldp x20, x21, [sp], #16
+                ldp x22, x23, [sp], #16
+                ldp x24, x25, [sp], #16
+                ldp x26, x27, [sp], #16
+                ldp x28, x29, [sp], #16
+                ldr x30, [sp], #8
+                ",
+                in("x0") self.regs[0],
+                in("x1") self.regs[1],
+                in("x2") self.regs[2],
+                in("x3") self.regs[3],
+                in("x4") self.regs[4],
+                in("x5") self.regs[5],
+                in("x6") self.regs[6],
+                in("x7") self.regs[7],
+                in("x8") self.regs[8],
+                in("x9") self.regs[9],
+                in("x10") self.regs[10],
+                in("x11") self.regs[11],
+                in("x12") self.regs[12],
+                in("x13") self.regs[13],
+                in("x14") self.regs[14],
+                in("x15") self.regs[15],
+                in("x16") self.regs[16],
+                in("x17") self.regs[17],
+                in("x18") self.regs[18],
+                in("x19") self.regs[19],
+                in("x20") self.regs[20],
+                in("x21") self.regs[21],
+                in("x22") self.regs[22],
+                in("x23") self.regs[23],
+                in("x24") self.regs[24],
+                in("x25") self.regs[25],
+                in("x26") self.regs[26],
+                in("x27") self.regs[27],
+                in("x28") self.regs[28],
+                in("x29") self.regs[29],
+                in("x30") self.regs[30],
+            );
+        }
+    }
+}
