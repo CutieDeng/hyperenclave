@@ -58,6 +58,7 @@ mod arch;
 
 use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
 
+use alloc::collections::BTreeMap;
 use config::HvSystemConfig;
 use enclave::reclaim;
 use error::HvResult;
@@ -148,6 +149,11 @@ fn primary_init_late() -> HvResult {
 
 fn main(cpu_id: usize, linux_sp: usize) -> HvResult {
     let cpu_data = unsafe { PerCpu::from_id_mut(cpu_id) }; 
+    {
+        // let mut a = BTreeMap::<i32, i32>::new(); 
+        // let b = a.entry(1); 
+        // b.or_insert(2); 
+    }
     let online_cpus = HvHeader::get().online_cpus as usize;
     let is_primary = ENTERED_CPUS.fetch_add(1, Ordering::SeqCst) == 0;
     wait_for_other_completed(&ENTERED_CPUS, online_cpus)?;
