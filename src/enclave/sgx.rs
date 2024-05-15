@@ -17,7 +17,9 @@
 use alloc::string::String;
 use alloc::sync::Arc;
 use bitflags::bitflags;
+use static_assertions::const_assert;
 use core::fmt::{Debug, Formatter, Result};
+use core::mem::size_of;
 use core::{convert::TryFrom, mem::MaybeUninit, ops::Range};
 
 use super::structs::{Sha256Value, SigKey3072Value};
@@ -370,7 +372,7 @@ pub struct StateSaveArea {
     pub misc: MiscSgx,
     pub gpr: GprSgx,
 }
-static_assertions::const_assert_eq!(core::mem::size_of::<StateSaveArea>(), 4096);
+const_assert!(size_of::<StateSaveArea>() == 4096); 
 
 impl StateSaveArea {
     pub fn ssa_ptr<'a>(

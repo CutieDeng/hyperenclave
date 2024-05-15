@@ -18,6 +18,7 @@
 // #![feature(lang_items)]
 #![feature(concat_idents)]
 #![feature(naked_functions)]
+#![feature(sync_unsafe_cell)]
 // #![allow(unaligned_references)]
 
 #![feature(asm_const)]
@@ -54,6 +55,10 @@ mod lang;
 
 #[cfg(target_arch = "x86_64")]
 #[path = "arch/x86_64/mod.rs"]
+mod arch;
+
+#[cfg(target_arch = "aarch64")]
+#[path = "arch/arm/mod.rs"]
 mod arch;
 
 use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};

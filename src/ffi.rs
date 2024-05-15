@@ -22,4 +22,4 @@ extern "C" {
 
 pub const PER_CPU_ARRAY_PTR: *mut PerCpu = __core_end as _;
 // pub const HEADER_PTR: *const HvHeader = __header_start as _;
-pub const HEADER_PTR: &'static HvHeader = unsafe { __header_start as _  as &'_ HvHeader }; 
+pub const HEADER_PTR: &'static HvHeader = unsafe { &*(__header_start as *const HvHeader) }; 
