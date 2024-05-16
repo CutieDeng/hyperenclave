@@ -1,48 +1,37 @@
-mod enclave;
-mod s2pt; // Stage 2 Page Table, analogous to Intel's EPT
-mod structs;
-mod vcpu;
-mod vmexit;
-mod smmu; // System Memory Management Unit, analogous to Intel's VT-d
+mod enclave;  // Secure enclave implementation
+mod stage2_page_table;  // Stage 2 page table handling
+mod vcpu;  // Virtual CPU state and operations
+mod exception;  // Exception handling for secure and non-secure states
+mod context; 
 
-use libvmm::sysreg; // Assuming there's an equivalent system register handler in libvmm
-use crate::arch::cpu::check_cpuid;
-use crate::arch::cpuid::CpuFeatures;
 use crate::error::{HvError, HvResult};
+use crate::arch::cpu::check_cpu_features;
 
-pub use s2pt::S2PTEntry as NPTEntry;
-pub use s2pt::EnclaveStage2PageTableUnlocked as EnclaveNestedPageTableUnlocked;
-pub use s2pt::Stage2PageTable as NestedPageTable;
+// Simplified modules for clarity
+pub use enclave::{EnclaveExceptionInfo, EnclaveThreadState};
+pub use stage2_page_table::{S2PTEntry, Stage2PageTable};
 pub use vcpu::Vcpu;
-pub use smmu::{SmmuPTEntry, SmmuPageTable, Iommu};
+pub use exception::{ExceptionInfo, ExceptionType};
 
-const HCR_EL2_MIN_REQUIRED: u64 = /* Hypervisor Configuration flags needed for your VMs */
-
-use core::convert::From; 
-
-impl From<SysRegFail> for HvError {
-    fn from(err: SysRegFail) -> Self {
-        match err {
-            SysRegFail::ReadError => hv_err!(EIO, format!("{:?}", err)),
-            _ => hv_err!(EIO, format!("{:?}", err)),
-        }
-    }
-}
-
+// Check virtualization and security features at the Hypervisor level
 pub fn check_hypervisor_feature() -> HvResult {
-    // Check cpuid for ARM feature support
-    check_cpuid()?;
-
-    // Check if CPU features support virtualization
-    if !CpuFeatures::new().has_virtualization() {
+    // Ensure the CPU supports the necessary virtualization features
+    if !check_cpu_features().has_virtualization() {
         warn!("ARM Virtualization not supported!");
         return hv_result_err!(ENODEV, "Virtualization feature checks failed!");
     }
 
-    let hcr_el2 = sysreg::HCR_EL2.read();
+    // Validate hypervisor configuration settings
+    let hcr_el2 = read_hcr_el2();
     if (hcr_el2 & HCR_EL2_MIN_REQUIRED) != HCR_EL2_MIN_REQUIRED {
-        return hv_result_err!(ENODEV, "required HCR_EL2 flags checks failed!");
+        return hv_result_err!(ENODEV, "Required HCR_EL2 flags checks failed!");
     }
 
     Ok(())
+}
+
+fn read_hcr_el2() -> u64 {
+    // Placeholder function to read the HCR_EL2 system register
+    // In actual implementation, this would involve specific system calls or privileged instructions
+    0x0000_0000_0000_0000  // Example value for placeholder
 }
