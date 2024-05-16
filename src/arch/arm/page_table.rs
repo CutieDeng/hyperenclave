@@ -3,6 +3,8 @@ use core::arch::asm;
 
 use crate::memory::{PagingResult, GenericPTE, MemFlags, PageTableLevel, PagingInstr, PhysAddr, VirtAddr};
 
+use bitflags::bitflags; 
+
 bitflags! {
     pub struct PageTableFlags: u32 {
         const TYPE_MASK = 0b11;

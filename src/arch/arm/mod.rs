@@ -1,16 +1,16 @@
-mod enclave;  // Secure enclave implementation
-mod vcpu;  // Virtual CPU state and operations
-mod exception;  // Exception handling for secure and non-secure states
-mod context; 
-mod cpu; 
-mod cpuid; 
-mod entry; 
-mod page_table; 
-mod segmentation;
-mod serial;
-mod tables;
-mod vmm; 
-mod xsave;
+pub mod enclave;  // Secure enclave implementation
+pub mod vcpu;  // Virtual CPU state and operations
+pub mod exception;  // Exception handling for secure and non-secure states
+pub mod context; 
+pub mod cpu; 
+pub mod cpuid; 
+pub mod entry; 
+pub mod page_table; 
+pub mod segmentation;
+pub mod serial;
+pub mod tables;
+pub mod vmm; 
+pub mod xsave;
 
 use crate::error::{HvError, HvResult};
 use crate::arch::cpu::check_cpu_features;

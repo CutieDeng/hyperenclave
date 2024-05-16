@@ -37,25 +37,44 @@ pub type ElRange = Range<GuestVirtAddr>;
 
 bitflags! {
     /// The ATTRIBUTES data structure is comprised of bit-granular fields that are used in the SECS.
+    /// 
+    /// 这个结构是一个位掩码结构，用于描述某 enclave 的属性 
     pub struct SgxAttributeFlags: u64 {
         /// This bit indicates if the enclave has been initialized by EINIT.
+        /// 
+        /// 表示 enclave 是否使用 EINIT 进行初始化 
         const INIT              = 1 << 0;
         /// If 1, the enclave permit debugger to read and write enclave data using EDBGRD and EDBGWR.
+        /// 
+        /// 表示是否允许调试器通过 EDBGRD, EDBGWR 读取、写入 Enclave 数据 
         const DEBUG             = 1 << 1;
         /// Enclave runs in 64-bit mode.
+        /// 
+        /// 表示 Enclave 是否运行在 64 位模式下 
         const MODE64BIT         = 1 << 2;
         /// Provisioning Key is available from EGETKEY.
+        /// 
+        /// 表示 Provisioning Key 是否可以通过 EGETKEY 获取 
         const PROVISIONKEY      = 1 << 4;
         /// EINIT token key is available from EGETKEY.
+        /// 
+        /// 表示 EINIT token key 是否可以通过 EGETKEY 获取 
         const EINITTOKEN_KEY    = 1 << 5;
         /// Enable CET attributes.
+        /// 
+        /// 启用 CET 属性 
         const CET               = 1 << 6;
         /// Key Separation and Sharing Enabled.
+        /// 
+        /// 启用 Key Separation 和共享功能 
         const KSS               = 1 << 7;
     }
 }
 
 /// ATTRIBUTES data structure in the SECS.
+/// 
+/// 这个结构用于表示一个 SGX Enclave 的属性：
+/// 初始状态，调试状态，关键属性 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct SgxAttributes {
@@ -67,6 +86,11 @@ pub struct SgxAttributes {
 
 bitflags! {
     /// Flags describing the state of the enclave page.
+    /// 
+    /// 这个结构用于记录各种状态和 Enclave 内存页的权限（笛卡尔积）
+    /// 
+    /// R/W/X: 该内存页的读、写、执行权限 
+    /// PENDING/MODIFIED/BLOCKED/VALID: 表示该页正在「等待改变」，已被修改、不可访问、已被验证 
     pub struct SgxEnclPageFlags: u8 {
         /// The page can be read from inside the enclave.
         const R         = 1 << 0;
@@ -88,45 +112,84 @@ bitflags! {
 }
 
 impl SgxEnclPageFlags {
+    /// 一个用于提取 R/W/X 的掩码 
     pub const PERM_MASK: Self = Self {
         bits: Self::R.bits() | Self::W.bits() | Self::X.bits(),
     };
 }
 
+/// Sgx Enclave 内存页类型 
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(FromPrimitive)]
 #[allow(non_camel_case_types, dead_code, clippy::upper_case_acronyms)]
 pub enum SgxEnclPageType {
-    /// Page is an SECS.
+    /// Secure Enclave Control Structure 
+    /// 
+    /// 用于存储该 enclave 的元数据
+    /// 例如，内存大小，基址等 
+    /// 
+    /// 任何一个 Enclave 都需要这样一个结构来定义它自身
+    /// 
+    /// 限制：...... 
+    /// 
     SECS = 0,
-    /// Page is a TCS.
+    /// Thread Control Structure 
+    /// 
+    /// 多线程支持的线程控制结构，用于维护各线程的相关控制结构 
+    /// 
+    /// 有点像单纯实现了一个线程安全机制 ... 
+    /// 
     TCS = 1,
-    /// Page is a regular page.
+    /// Regular page 
+    /// 
+    /// 最灵活、常用的内存页类型，是主要的数据、代码存储结构 
+    /// 它的灵活性使它可以用在各种 enclave 中 
+    /// 
     REG = 2,
-    /// Page is a Version Array.
+    /// Version Array 
+    /// 
+    /// 用于追踪内存页的版本变化，
+    /// 
+    /// ??? 
+    /// 
     VA = 3,
-    /// Page is in trimmed state.
+    /// 表示该内存页被标记为 trimmed, 但还没有 reclaimed 或重用。 
+    /// 
+    /// 在 enclave 中，这用于优化内存的使用，通过 
+    /// 
     TRIM = 4,
     /// Page is first page of a shadow stack.
+    /// 
+    /// 表示 shadow stack 的第一个页
+    /// 
     SS_FIRST = 5,
     /// Page is not first page of a shadow stack.
+    /// 
+    /// 表示 shadow stack 的非第一个页 
+    /// 
     SS_REST = 6,
 }
+
+use num_derive::FromPrimitive;    
+use num_traits::FromPrimitive;
 
 impl TryFrom<u8> for SgxEnclPageType {
     type Error = HvError;
 
     fn try_from(page_type: u8) -> HvResult<SgxEnclPageType> {
-        match page_type {
-            0 => Ok(SgxEnclPageType::SECS),
-            1 => Ok(SgxEnclPageType::TCS),
-            2 => Ok(SgxEnclPageType::REG),
-            3 => Ok(SgxEnclPageType::VA),
-            4 => Ok(SgxEnclPageType::TRIM),
-            5 => Ok(SgxEnclPageType::SS_FIRST),
-            6 => Ok(SgxEnclPageType::SS_REST),
-            _ => hv_result_err!(EINVAL, format!("Invalid page_type={:#x}", page_type)),
-        }
+        let ans : Option<SgxEnclPageType> = FromPrimitive::from_u8(page_type); 
+        return ans.ok_or_else(|| hv_result_err!(EINVAL, format!("Invalid page_type={:#x}", page_type))); 
+        // match page_type {
+        //     0 => Ok(SgxEnclPageType::SECS),
+        //     1 => Ok(SgxEnclPageType::TCS),
+        //     2 => Ok(SgxEnclPageType::REG),
+        //     3 => Ok(SgxEnclPageType::VA),
+        //     4 => Ok(SgxEnclPageType::TRIM),
+        //     5 => Ok(SgxEnclPageType::SS_FIRST),
+        //     6 => Ok(SgxEnclPageType::SS_REST),
+        //     _ => hv_result_err!(EINVAL, format!("Invalid page_type={:#x}", page_type)),
+        // }
     }
 }
 

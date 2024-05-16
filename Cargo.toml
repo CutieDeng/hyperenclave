@@ -41,6 +41,9 @@ yogcrypt = { path = "./crates/yogcrypt" }
 static_assertions = "1.1.0"
 memoffset = "0.8"
 
+num-derive = "*" 
+num-traits = { version = "*", default-features = false } 
+
 [target.'cfg(target_arch = "x86_64")'.dependencies]
 uart_16550 = { path = "./crates/uart_16550" }
 x86 = "0"
