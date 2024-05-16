@@ -1,15 +1,22 @@
 mod enclave;  // Secure enclave implementation
-mod stage2_page_table;  // Stage 2 page table handling
 mod vcpu;  // Virtual CPU state and operations
 mod exception;  // Exception handling for secure and non-secure states
 mod context; 
+mod cpu; 
+mod cpuid; 
+mod entry; 
+mod page_table; 
+mod segmentation;
+mod serial;
+mod tables;
+mod vmm; 
+mod xsave;
 
 use crate::error::{HvError, HvResult};
 use crate::arch::cpu::check_cpu_features;
 
 // Simplified modules for clarity
 pub use enclave::{EnclaveExceptionInfo, EnclaveThreadState};
-pub use stage2_page_table::{S2PTEntry, Stage2PageTable};
 pub use vcpu::Vcpu;
 pub use exception::{ExceptionInfo, ExceptionType};
 
