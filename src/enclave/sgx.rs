@@ -179,7 +179,12 @@ impl TryFrom<u8> for SgxEnclPageType {
 
     fn try_from(page_type: u8) -> HvResult<SgxEnclPageType> {
         let ans : Option<SgxEnclPageType> = FromPrimitive::from_u8(page_type); 
-        return ans.ok_or_else(|| hv_result_err!(EINVAL, format!("Invalid page_type={:#x}", page_type))); 
+        if ans.is_some() {
+            return Ok(ans.unwrap()); 
+        } else {
+            return hv_result_err!(EINVAL, format!("Invalid page_type={:#x}", page_type)); 
+        }
+        // return ans.ok_or_else(|| hv_result_err!(EINVAL, format!("Invalid page_type={:#x}", page_type))); 
         // match page_type {
         //     0 => Ok(SgxEnclPageType::SECS),
         //     1 => Ok(SgxEnclPageType::TCS),

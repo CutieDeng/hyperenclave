@@ -62,7 +62,7 @@ unsafe extern "sysv64" fn switch_stack(cpu_id: usize, linux_sp: usize) -> i32 {
 #[no_mangle]
 pub unsafe extern "C" fn arch_entry(_cpu_id: usize) -> i32 {
     #[cfg(target_arch = "x86_64")] 
-    asm!("
+    { asm!("
         // rip is pushed
         cli
         push rbp
@@ -85,9 +85,9 @@ pub unsafe extern "C" fn arch_entry(_cpu_id: usize) -> i32 {
         // rip will pop when return",
         sym switch_stack,
         options(noreturn),
-    )
+    ) } 
     #[cfg(target_arch = "aarch64")] 
-    asm!(
+    { asm!(
         "
         // x30 (link register) is automatically pushed to the stack
         mrs x0, SPSR_EL1
@@ -142,5 +142,5 @@ pub unsafe extern "C" fn arch_entry(_cpu_id: usize) -> i32 {
         ",
         sym switch_stack,
         options(noreturn),
-    )
+    ) }
 }
