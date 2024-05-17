@@ -190,6 +190,7 @@ fn restore_states(cpu_id: usize) {
     cpu_data.return_to_linux();
 }
 
+#[cfg(target_arch = "x86_64")]
 extern "sysv64" fn entry(cpu_id: usize, linux_sp: usize) -> i32 {
     let mut code = 0;
     if let Err(e) = main(cpu_id, linux_sp) {

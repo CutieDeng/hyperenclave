@@ -1,10 +1,14 @@
 pub mod cpu { } 
 pub mod serial { } 
-pub mod vmm { } 
 
 #[macro_use]
 mod context; 
 mod page_table; 
+mod enclave; 
+mod exception; 
+mod xsave; 
+
+pub mod vmm; 
 
 pub use context::{GuestRegisters, LinuxContext};
 pub use enclave::{EnclaveExceptionInfo, EnclavePFErrorCode, EnclaveThreadState};
