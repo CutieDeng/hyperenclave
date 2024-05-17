@@ -12,27 +12,30 @@ pub mod tables;
 pub mod vmm; 
 pub mod xsave;
 
-use crate::error::{HvError, HvResult};
-use crate::arch::cpu::check_cpu_features;
+use crate::error::HvResult; 
+// use crate::error::HvError;
+// use crate::arch::cpu::check_cpu_features;
 
 // Simplified modules for clarity
 pub use enclave::{EnclaveExceptionInfo, EnclaveThreadState};
 pub use vcpu::Vcpu;
 pub use exception::{ExceptionInfo, ExceptionType};
 
+pub use context::LinuxContext; 
+
 // Check virtualization and security features at the Hypervisor level
 pub fn check_hypervisor_feature() -> HvResult {
-    // Ensure the CPU supports the necessary virtualization features
-    if !check_cpu_features().has_virtualization() {
-        warn!("ARM Virtualization not supported!");
-        return hv_result_err!(ENODEV, "Virtualization feature checks failed!");
-    }
+    // // Ensure the CPU supports the necessary virtualization features
+    // if !check_cpu_features().has_virtualization() {
+    //     warn!("ARM Virtualization not supported!");
+    //     return hv_result_err!(ENODEV, "Virtualization feature checks failed!");
+    // }
 
-    // Validate hypervisor configuration settings
-    let hcr_el2 = read_hcr_el2();
-    if (hcr_el2 & HCR_EL2_MIN_REQUIRED) != HCR_EL2_MIN_REQUIRED {
-        return hv_result_err!(ENODEV, "Required HCR_EL2 flags checks failed!");
-    }
+    // // Validate hypervisor configuration settings
+    // let hcr_el2 = read_hcr_el2();
+    // if (hcr_el2 & HCR_EL2_MIN_REQUIRED) != HCR_EL2_MIN_REQUIRED {
+    //     return hv_result_err!(ENODEV, "Required HCR_EL2 flags checks failed!");
+    // }
 
     Ok(())
 }

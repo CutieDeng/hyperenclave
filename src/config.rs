@@ -49,7 +49,9 @@ pub struct HvRmrrRange {
     pub limit: u64,
 }
 
-#[cfg(target_arch = "x86_64")]
+/// 在 AArch64 中依旧复用该结构 
+/// 通过 iommu_units, rmrr_ranges 来处理可用内存 
+// #[cfg(target_arch = "x86_64")]
 #[derive(Debug)]
 #[repr(C, packed)]
 #[derive(Clone, Copy)]

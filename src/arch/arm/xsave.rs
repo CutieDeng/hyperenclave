@@ -1,4 +1,4 @@
-use core::arch::arm::{vst1q_f32, vld1q_f32};
+use core::arch::asm;
 use core::fmt::{Debug, Formatter, Result};
 use crate::error::HvResult;
 

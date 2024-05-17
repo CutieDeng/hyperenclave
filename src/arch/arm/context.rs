@@ -103,15 +103,11 @@ impl LinuxContext {
     // 从 linux 栈指针读出 LinuxContext 内容
     pub fn load_from(linux_sp: usize) -> Self {
         let regs = unsafe { core::slice::from_raw_parts(linux_sp as *const u64, 31) };
+        let regs = regs.as_chunks::<31>(); 
+        let regs = &regs.0[0]; 
 
         Self {
-            regs: [
-                regs[0], regs[1], regs[2], regs[3], regs[4], regs[5], regs[6],
-                regs[7], regs[8], regs[9], regs[10], regs[11], regs[12], regs[13],
-                regs[14], regs[15], regs[16], regs[17], regs[18], regs[19], regs[20],
-                regs[21], regs[22], regs[23], regs[24], regs[25], regs[26], regs[27],
-                regs[28], regs[29], regs[30],
-            ],
+            regs: *regs, 
             sp: unsafe { core::ptr::read((linux_sp + 31 * 8) as *const u64) },
             pc: unsafe { core::ptr::read((linux_sp + 32 * 8) as *const u64) },
             spsr_el1: unsafe { core::ptr::read((linux_sp + 33 * 8) as *const u64) },

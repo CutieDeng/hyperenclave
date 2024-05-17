@@ -1,7 +1,6 @@
 use core::arch::asm;
 use spin::Mutex;
 
-#[cfg(feature = "arm")]
 use core::sync::atomic::{AtomicU64, Ordering};
 
 pub(super) static IVT: Mutex<IVTStruct> = Mutex::new(IVTStruct::new());

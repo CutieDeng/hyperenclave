@@ -1,6 +1,8 @@
-use crate::error::HvResult;
+use crate::{enclave::{AexException, VcpuAccessEnclaveState}, error::HvResult, memory::addr::align_down};
 use core::fmt::Debug;
 use bitflags::bitflags;
+
+use super::{ExceptionInfo, ExceptionType};
 
 bitflags! {
     #[repr(transparent)]

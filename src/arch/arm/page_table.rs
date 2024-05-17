@@ -1,7 +1,7 @@
 use core::fmt::{Debug, Formatter, Result};
 use core::arch::asm;
 
-use crate::memory::{PagingResult, GenericPTE, MemFlags, PageTableLevel, PagingInstr, PhysAddr, VirtAddr};
+use crate::memory::{GenericPTE, Level4PageTable, Level4PageTableImmut, Level4PageTableUnlocked, MemFlags, PageTableLevel, PagingInstr, PagingResult, PhysAddr, VirtAddr};
 
 use bitflags::bitflags; 
 

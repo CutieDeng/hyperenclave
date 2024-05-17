@@ -44,8 +44,3 @@ fn panic(info: &PanicInfo) -> ! {
     crate::logging::set_vmm_state(cpu_data.cpu_id, 0);
     loop {}
 }
-
-// #[lang = "oom"]
-// fn oom(_: Layout) -> ! {
-//     panic!("out of memory");
-// }

@@ -46,47 +46,53 @@ pub enum CpuState {
 }
 
 /// PerCpu 定义了一个抽象机中的物理 cpu 
+/// 
+/// 描述了一个在 HyperEnclave OS 眼中所应当看到的 CPU 的状态和信息 
 #[repr(align(4096))]
 pub struct PerCpu {
     /// 当前物理 cpu 标识
     pub cpu_id: usize,
     /// cpu 状态：Hv 开启、关闭、运行
     pub state: CpuState,
-    /// vcpu 
+    /// vcpu, 虚拟 cpu? 
     pub vcpu: Vcpu,
     /// cpu 所使用的栈空间 
     /// ? 为什么定义在这 
     stack: [usize; HV_STACK_SIZE / size_of::<usize>()],
+    /// Linux 线程执行上下文 
     /// 
+    /// 定义了所有线程执行环境，和 EL1 运行环境，用于管理其他 EL1 程序或自身 
     linux: LinuxContext,
+    /// 页表管理 
+    /// 
+    /// 并不是直接页表管理，而是间接管理 
     hvm: MemorySet<HostPageTable>,
     enclave_thread: EnclaveThread,
 }
 
 impl PerCpu {
-    pub fn from_id<'a>(cpu_id: usize) -> &'a Self {
+
+    pub fn from_id(cpu_id: usize) -> &'static Self {
         unsafe {
             &core::slice::from_raw_parts(PER_CPU_ARRAY_PTR, HvHeader::get().max_cpus as usize)
                 [cpu_id]
         }
     }
 
-    // 该抽象错误，将一个 usize 直接转换成一个无约束的引用... 
-    // 怎么就不舍得实现一个 Option 呢？
-    pub fn from_id_mut(cpu_id: usize) -> Option<&'static mut Self> { 
+    pub fn from_id_mut(cpu_id: usize) -> &'static mut Self { 
         unsafe {
-            core::slice::from_raw_parts_mut(
+            &mut core::slice::from_raw_parts_mut(
                 PER_CPU_ARRAY_PTR,
                 HvHeader::get().max_cpus as usize,
-            ).get_mut(cpu_id)
+            )[cpu_id] 
         }
     }
 
-    pub fn from_local_base<'a>() -> &'a Self {
+    pub fn from_local_base() -> &'static Self {
         unsafe { &*(LOCAL_PER_CPU_BASE as *const Self) }
     }
 
-    pub fn from_local_base_mut<'a>() -> &'a mut Self {
+    pub fn from_local_base_mut() -> &'static mut Self {
         unsafe { &mut *(LOCAL_PER_CPU_BASE as *mut Self) }
     }
 

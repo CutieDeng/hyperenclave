@@ -67,9 +67,15 @@ macro_rules! set_guest_segment {
 
 impl Vcpu {
     pub fn new(linux: &LinuxContext, cell: &Cell) -> HvResult<Self> {
+        // question: 这段代码在 
+
+        // 检查当前 Hypervisor 处理器支持虚拟化 
+        // 且虚拟化特性已开启，这是虚拟化的前提条件 
         super::check_hypervisor_feature()?;
 
         // make sure all perf counters are off
+        // 确保性能计数器被关闭 
+        // 避免性能计数器对虚拟化环境造成干扰 
         if CpuFeatures::new().perf_monitor_version_id() > 0 {
             unsafe { Msr::IA32_PERF_GLOBAL_CTRL.write(0) };
         }
@@ -78,14 +84,19 @@ impl Vcpu {
         let _cr0 = linux.cr0;
         let cr4 = linux.cr4;
         // TODO: check reserved bits
+
+        // 确保 VMX 扩展没有被启用，防止重复启用 
         if cr4.contains(Cr4Flags::VIRTUAL_MACHINE_EXTENSIONS) {
             return hv_result_err!(EBUSY, "VMX is already turned on!");
         }
+        // 检查 L5 页表是否处于关闭状态 
         if cr4.contains(Cr4Flags::L5_PAGING) {
             error!("L5_PAGING isn't supported by hypervisor!");
         }
 
         // Enable VMXON, if required.
+        // VMXON off -> VMXON on 
+        // VMXON on -> VMXON on 
         let ctrl = FeatureControl::read();
         let locked = ctrl.contains(FeatureControlFlags::LOCKED);
         let vmxon_outside = ctrl.contains(FeatureControlFlags::VMXON_ENABLED_OUTSIDE_SMX);

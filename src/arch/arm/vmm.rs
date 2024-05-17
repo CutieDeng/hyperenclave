@@ -10,8 +10,9 @@ pub trait VcpuAccessGuestState {
     fn set_return_val(&mut self, ret_val: usize);
 }
 
-#[cfg(feature = "arm")]
-pub use vendor::{IoPTEntry, IoPageTable, Iommu, NPTEntry, NestedPageTable, Vcpu};
+// pub use super::vendor::{IoPTEntry, IoPageTable, Iommu, NPTEntry, NestedPageTable, Vcpu};
+
+use super::context::GuestRegisters;
 
 const VM_EXIT_LEN_HYPERCALL: u8 = 3;
 
