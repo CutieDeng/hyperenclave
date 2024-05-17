@@ -4,6 +4,7 @@ pub mod vmm { }
 
 #[macro_use]
 mod context; 
+mod page_table; 
 
 pub use context::{GuestRegisters, LinuxContext};
 pub use enclave::{EnclaveExceptionInfo, EnclavePFErrorCode, EnclaveThreadState};
