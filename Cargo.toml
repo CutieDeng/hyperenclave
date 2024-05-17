@@ -30,7 +30,6 @@ numeric-enum-macro = "0.2"
 buddy_system_allocator = "0.5"
 # libvmm = { path = "./crates/libvmm", default-features = false }
 libvmm = { path = "./crates/libvmm" } 
-uart_16550 = { path = "./crates/uart_16550" }
 lazy_static = { version = "1.4", features = ["spin_no_std"] }
 bitmap-allocator = { git = "https://github.com/rcore-os/bitmap-allocator", rev = "03bd9909" }
 sha2 = { version = "0.9.3", default-features = false, features = ["force-soft"] }
@@ -44,3 +43,4 @@ memoffset = "0.8"
 x86 = "0"
 x86_64 = "0.14"
 raw-cpuid = "10.6"
+uart_16550 = { path = "./crates/uart_16550" }

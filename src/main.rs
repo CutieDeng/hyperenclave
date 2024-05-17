@@ -56,6 +56,14 @@ mod lang;
 #[path = "arch/x86_64/mod.rs"]
 mod arch;
 
+#[cfg(target_arch = "aarch64")]
+#[path = "arch/arm/mod.rs"]
+mod arch;
+
+
+
+
+
 use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
 
 use config::HvSystemConfig;

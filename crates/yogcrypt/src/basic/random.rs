@@ -18,30 +18,37 @@ use core::cmp;
 use core::fmt;
 use core::mem;
 
-use core::arch::global_asm; 
+use core::arch::global_asm;
+use core::mem::MaybeUninit; 
 
+// 当编译目标不是 x86 / x86-64 时，该操作不成立
+#[cfg(any(target_arch = "x86_64"))] 
 global_asm!(include_str!("rand.S"), options(att_syntax));
+
+#[cfg(any(target_arch = "aarch64"))] 
+global_asm!(include_str!("rand-arm.S")); 
 
 #[inline]
 fn getrandom(buf: &mut [u8]) {
     extern "C" {
-        fn do_rdrand(rand: *mut u32) -> u32;
+        // fn do_rdrand(rand: *mut u32) -> u32;
+        // Actually, it's more proper when using this method 
+        fn do_rdrand(rand_result: &mut MaybeUninit<u32>) -> u32; 
     }
 
-    let mut rand_num = [0_u8; mem::size_of::<u32>()];
-    let mut left_len = buf.len();
-    let mut offset = 0_usize;
+    let mut rand_num : MaybeUninit<u32> = MaybeUninit::uninit(); 
+    let mut to_fill = &mut buf[..]; 
 
-    while left_len > 0 {
-        if unsafe { do_rdrand(&mut rand_num as *mut _ as *mut u32) } == 0 {
+    while !to_fill.is_empty() {
+        // 一旦访问随机数失败，就触发一个非法指令操作... 
+        // 换言之，即断言该操作一定成功
+        if unsafe { do_rdrand(&mut rand_num) } == 0 {
             core::intrinsics::abort()
         }
 
-        let copy_len = cmp::min(left_len, mem::size_of::<u32>());
-        buf[offset..offset + copy_len].copy_from_slice(&rand_num[..copy_len]);
-
-        left_len -= copy_len;
-        offset += copy_len;
+        let copy_len = cmp::min(mem::size_of_val(to_fill), mem::size_of_val(&rand_num)); 
+        to_fill[..copy_len].copy_from_slice( unsafe { &rand_num.assume_init_ref().to_ne_bytes() } ); 
+        to_fill = &mut to_fill[copy_len..]; 
     }
 }
 
