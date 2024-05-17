@@ -73,13 +73,9 @@ pub trait VcpuAccessGuestState {
     fn regs_mut(&mut self) -> &mut GuestRegisters;
     fn instr_pointer(&self) -> u64;
     fn stack_pointer(&self) -> u64;
-    fn frame_pointer(&self) -> u64 {
-        self.regs().rbp
-    }
+    fn frame_pointer(&self) -> u64; 
     fn set_stack_pointer(&mut self, sp: u64);
-    fn set_return_val(&mut self, ret_val: usize) {
-        self.regs_mut().rax = ret_val as _
-    }
+    fn set_return_val(&mut self, ret_val: usize); 
 
     // Methods only available for x86 cpus:
     fn rflags(&self) -> u64;
@@ -127,7 +123,8 @@ impl VcpuAccessGuestState for AArch64Vcpu {
 
     // 下面的方法在 AArch64 上没有直接对应，因此提供空实现或者适当的模拟
     fn rflags(&self) -> u64 {
-        self.registers.pstate  // 使用 pstate 作为类似 rflags 的状态寄存器
+        // self.registers.pstate  // 使用 pstate 作为类似 rflags 的状态寄存器
+        0 
     }
 
     fn fs_base(&self) -> u64 {

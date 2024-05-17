@@ -96,7 +96,8 @@ impl GenericPTE for PTEntry {
     fn flags(&self) -> MemFlags {
         let bits = self.0 & !PHYS_ADDR_MASK;
         let mut mem_flags = MemFlags::empty();
-        if bits & (1 << 0) != 0 { mem_flags |= MemFlags::PRESENT; }
+        // if bits & (1 << 0) != 0 { mem_flags |= MemFlags::PRESENT; }
+        if bits & (1 << 0) == 0 { mem_flags |= MemFlags::NO_PRESENT; }
         if bits & (1 << 1) != 0 { mem_flags |= MemFlags::WRITE; }
         if bits & (1 << 6) == 0 { mem_flags |= MemFlags::EXECUTE; } // No-Execute is inverted
         if bits & (1 << 2) != 0 { mem_flags |= MemFlags::USER; }
@@ -138,7 +139,8 @@ impl GenericPTE for PTEntry {
     // Sets the flags for the entry.
     fn set_flags(&mut self, flags: MemFlags, is_huge: bool) -> PagingResult {
         let mut bits = 0;
-        if flags.contains(MemFlags::PRESENT) { bits |= 1 << 0; }
+        // if flags.contains(MemFlags::PRESENT) { bits |= 1 << 0; }
+        if !flags.contains(MemFlags::NO_PRESENT) { bits |= 1 << 0; } 
         if flags.contains(MemFlags::WRITE) { bits |= 1 << 1; }
         if !flags.contains(MemFlags::EXECUTE) { bits |= 1 << 6; }
         if flags.contains(MemFlags::USER) { bits |= 1 << 2; }

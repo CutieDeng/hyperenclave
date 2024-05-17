@@ -202,3 +202,16 @@ extern "sysv64" fn entry(cpu_id: usize, linux_sp: usize) -> i32 {
     println!("CPU {} return back to driver with code {}.", cpu_id, code);
     code
 }
+
+#[cfg(target_arch = "aarch64")]
+extern "C" fn entry(cpu_id: usize, linux_sp: usize) -> i32 {
+    let mut code = 0;
+    if let Err(e) = main(cpu_id, linux_sp) {
+        error!("{:?}", e);
+        ERROR_NUM.store(e.code(), Ordering::Release);
+        code = e.code();
+    }
+    restore_states(cpu_id);
+    println!("CPU {} return back to driver with code {}.", cpu_id, code);
+    code
+}
