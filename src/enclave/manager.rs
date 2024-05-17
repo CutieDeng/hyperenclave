@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use alloc::sync::Arc;
-use core::convert::Into;
+use core::{convert::Into, ptr::addr_of};
 use spin::RwLock;
 
 use super::Enclave;
@@ -89,4 +89,4 @@ impl EnclaveManager {
 const BUFFER_LEN: usize = core::mem::size_of::<EnclaveManager>() / core::mem::size_of::<usize>();
 static mut EMPTY_BUFFER: [usize; BUFFER_LEN] = [0; BUFFER_LEN];
 
-pub static ENCLAVE_MANAGER: &EnclaveManager = unsafe { core::mem::transmute(&EMPTY_BUFFER) };
+pub static ENCLAVE_MANAGER: &EnclaveManager = unsafe { core::mem::transmute(addr_of!(EMPTY_BUFFER)) };
