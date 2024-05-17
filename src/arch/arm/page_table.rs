@@ -33,9 +33,9 @@ impl From<MemFlags> for AArch64PageTableFlags {
         if !f.contains(MemFlags::EXECUTE) {
             bits |= Self::UXN | Self::PXN;
         }
-        if f.contains(MemFlags::ACCESSED) {
-            bits |= Self::AF;
-        }
+        // if f.contains(MemFlags::ACCESSED) {
+        //     bits |= Self::AF;
+        // }
 
         Self { bits }
     }
@@ -72,9 +72,9 @@ impl From<AArch64PageTableFlags> for MemFlags {
         } else {
             mem_flags.insert(MemFlags::EXECUTE);
         }
-        if f.bits & AArch64PageTableFlags::AF != 0 {
-            mem_flags.insert(MemFlags::ACCESSED);
-        }
+        // if f.bits & AArch64PageTableFlags::AF != 0 {
+        //     mem_flags.insert(MemFlags::ACCESSED);
+        // }
 
         mem_flags
     }

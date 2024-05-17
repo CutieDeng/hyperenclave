@@ -35,11 +35,11 @@ pub enum HvErrorNum {
 }
 
 pub struct HvError {
-    num: HvErrorNum,
-    loc_file: &'static str,
-    loc_line: u32,
-    loc_col: u32,
-    msg: Option<String>,
+    pub num: HvErrorNum,
+    pub loc_file: &'static str,
+    pub loc_line: u32,
+    pub loc_col: u32,
+    pub msg: Option<String>,
 }
 
 pub type HvResult<T = ()> = core::result::Result<T, HvError>;
@@ -103,6 +103,10 @@ impl HvError {
 
     pub fn msg(&self) -> Option<String> {
         self.msg.as_ref().map(|string| string.into())
+    }
+
+    pub fn msg_ref(&self) -> &Option<String> {
+        &self.msg 
     }
 
     pub fn code(&self) -> i32 {

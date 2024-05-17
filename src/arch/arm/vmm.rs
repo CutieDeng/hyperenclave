@@ -29,11 +29,61 @@ const FLAG_EXECUTE: u64 = 1 << 2;
 
 use alloc::vec::Vec;
 
+use crate::memory::{GenericPageTable, GenericPageTableImmut};
+
 use super::GuestRegisters; 
 
 pub struct NestedPageTable {
     // 嵌套页表通常使用多级页表结构，在这里我们假设只用一个简单数组模拟
     entries: Vec<NPTEntry>,
+}
+
+impl GenericPageTableImmut for NestedPageTable {
+    type VA = usize;
+
+    unsafe fn from_root(root_paddr: crate::memory::PhysAddr) -> Self {
+        // todo!()
+        Self::new(0) 
+    }
+
+    fn root_paddr(&self) -> crate::memory::PhysAddr {
+        self.entries.first().map_or(0, |e| e.entry) 
+    }
+
+    fn query(&self, vaddr: Self::VA) -> crate::memory::PagingResult<(crate::memory::PhysAddr, crate::memory::MemFlags, crate::memory::PageSize)> {
+        todo!()
+    }
+}
+
+impl GenericPageTable for NestedPageTable {
+    fn new() -> Self {
+        NestedPageTable::new(0) 
+    }
+
+    fn map(&mut self, region: &crate::memory::MemoryRegion<Self::VA>) -> crate::memory::PagingResult {
+        todo!()
+    }
+
+    fn unmap(&mut self, region: &crate::memory::MemoryRegion<Self::VA>)
+        -> crate::memory::PagingResult<Vec<(crate::memory::PhysAddr, crate::memory::PageSize)>> {
+        todo!()
+    }
+
+    fn update(&mut self, region: &crate::memory::MemoryRegion<Self::VA>) -> crate::memory::PagingResult {
+        todo!()
+    }
+
+    fn clone(&self) -> Self {
+        todo!()
+    }
+
+    unsafe fn activate(&self) {
+        todo!()
+    }
+
+    fn flush(&self, vaddr: Option<Self::VA>) {
+        todo!()
+    }
 }
 
 impl NestedPageTable {

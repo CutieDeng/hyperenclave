@@ -20,7 +20,9 @@ use crate::enclave::sgx::EnclaveErrorCode;
 use crate::error::{HvError, HvErrorNum};
 
 pub enum HyperCallErrorType {
+    /// 管理程序的向下操作时发生异常 
     HvError(HvErrorNum),
+    
     EnclaveError(EnclaveErrorCode),
     Exception(EnclaveExceptionInfo),
 }

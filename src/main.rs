@@ -22,6 +22,12 @@
 
 #![feature(asm_const)]
 
+#![allow(unused_imports)]
+
+// TODO: 自动导入宏 format, log, lazy static ... 
+// 移除后需要大量重 use. 来不及改 
+// pub use log::{info, log, warn, error, debug}; 
+
 #[macro_use]
 extern crate alloc;
 #[macro_use]
@@ -59,10 +65,6 @@ mod arch;
 #[cfg(target_arch = "aarch64")]
 #[path = "arch/arm/mod.rs"]
 mod arch;
-
-
-
-
 
 use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
 

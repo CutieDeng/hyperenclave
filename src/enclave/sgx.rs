@@ -535,22 +535,44 @@ pub struct SigStruct {
 #[derive(PartialEq, Copy, Clone)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum EnclaveErrorCode {
+    /// 页面状态与预期不符，可能被破坏或内部状态不一致 
     EBLKSTATE = 0x4000_0003,
+
+    /// 页面阻塞（即禁止 R/W/X 等操作）
+    /// 
+    /// 某个操作要求页面处于阻塞状态，但页面本身依旧可以被访问，这可能是因为页面管理逻辑的错误。 
     EPAGENOTBLOCKED = 0x4000_000a,
+
+    /// 表示 enclave 中该页面未被管理程序追踪，或追踪失败     
     ENOTTRACKED = 0x4000_000b,
+
+    /// 指示操作与 enclave 当前状态冲突，例如 enclave 未激活却被执行某些操作 
+    /// 
+    /// 激活状态，即 enclave 被加载且初始化完成
+    /// 例如，在此时对其内部数据进行访问，或执行某些加解密操作，密钥交换，或休眠恢复失败 
     EENCLAVEACT = 0x4000_000e,
+
+    /// Enclave 入口点已锁定，不能进行修改或更新 
     EENTRYEPOCHLOCKED = 0x4000_000f,
+
+    /// 指示先前的页面跟踪未完成 (?)
     EPREVTRKINCMPL = 0x4000_0011,
+
+    /// 页面属性与要求不匹配，或与 enclave 安全策略不符     
     EPAGEATTRIBUTESMISMATCH = 0x4000_0013,
+
+    /// 表示页面不可修改，页面被锁定 
     PAGENOTMODIFIABLE = 0x4000_0014,
+
+    /// 取消了对某个页面的回收操作 
     ECANCELRECLAIM = 0x4000_001d,
 }
 
 impl EnclaveErrorCode {
-    pub fn as_string(&self) -> String {
-        use EnclaveErrorCode::*;
 
-        let msg = match self {
+    pub fn as_str(&self) -> &'static str {
+        use EnclaveErrorCode::*;
+        match self {
             EBLKSTATE => "Page is already in blocked state",
             EPAGENOTBLOCKED => "Page is not marked as blocked",
             ENOTTRACKED => "Tracking cycle isn't done",
@@ -562,13 +584,18 @@ impl EnclaveErrorCode {
                 "Page cannot be modified because it is in the PENDING or MODIFIED state"
             }
             ECANCELRECLAIM => "Cancel reclaim EPC page",
-        };
+        }
+    }
+
+    pub fn as_string(&self) -> String {
+        let msg = self.as_str(); 
         String::from(msg)
     }
 
     pub fn code(&self) -> i32 {
         -(*self as u32 as i32)
     }
+
 }
 
 impl Default for SgxSecs {

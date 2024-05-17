@@ -1,4 +1,4 @@
-use core::arch::asm;
+use core::{arch::asm, convert::TryInto};
 
 macro_rules! save_regs_to_stack {
     () => {
