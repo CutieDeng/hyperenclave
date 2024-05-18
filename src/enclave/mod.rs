@@ -424,6 +424,7 @@ impl Enclave {
             for frame in self.gpt.read().all_frames() {
                 let gpaddr = frame.start_paddr();
                 let hpaddr = gpaddr;
+                #[cfg(target_arch = "x86_64")]
                 self.npt.write().map(&MemoryRegion::new_with_offset_mapper(
                     gpaddr,
                     hpaddr,
@@ -757,6 +758,7 @@ impl Enclave {
 
         if metadata.sec_info.page_type == SgxEnclPageType::REG {
             let npt_flags = (gpt_flags - MemFlags::NO_PRESENT) | MemFlags::ENCRYPTED;
+            #[cfg(target_arch = "x86_64")]
             self.npt.write().map(&MemoryRegion::new_with_offset_mapper(
                 gpaddr_dst, gpaddr_dst, PAGE_SIZE, npt_flags,
             ))?;
