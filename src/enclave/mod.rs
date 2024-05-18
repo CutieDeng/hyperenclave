@@ -921,21 +921,21 @@ impl Enclave {
         };
         {
             let _encl_mem_lock = self.encl_mem_lock.lock();
-            if let Err(e) = self.npt.write().map(&MemoryRegion::new_with_offset_mapper(
-                gpaddr, gpaddr, PAGE_SIZE, npt_flags,
-            )) {
-                match e {
-                    // In multi-threaded scenarios, threads may generate #NPF for the same physical address.
-                    // One of the thread may handle the #PF (the first thread),
-                    // and other threads may create get the `AlreadyMapped` error.
-                    // In this case, simply return here.
-                    PagingError::AlreadyMapped(_) => {}
-                    e => {
-                        error!("Enclave::handle_npt_violation(): Ecounter error when new mapping, error: {:?}, gpaddr: {:#x?}", e, gpaddr);
-                        return hv_result_err!(EINVAL);
-                    }
-                }
-            }
+            // if let Err(e) = self.npt.write().map(&MemoryRegion::new_with_offset_mapper(
+            //     gpaddr, gpaddr, PAGE_SIZE, npt_flags,
+            // )) {
+            //     match e {
+            //         // In multi-threaded scenarios, threads may generate #NPF for the same physical address.
+            //         // One of the thread may handle the #PF (the first thread),
+            //         // and other threads may create get the `AlreadyMapped` error.
+            //         // In this case, simply return here.
+            //         PagingError::AlreadyMapped(_) => {}
+            //         e => {
+            //             error!("Enclave::handle_npt_violation(): Ecounter error when new mapping, error: {:?}, gpaddr: {:#x?}", e, gpaddr);
+            //             return hv_result_err!(EINVAL);
+            //         }
+            //     }
+            // }
         }
         Ok(())
     }

@@ -110,3 +110,22 @@ impl GuestRegisters {
     }
 }
 
+// impl GuestRegisters {
+//     pub fn return_to_linux(&self, linux: &LinuxContext) -> ! {
+//         unsafe {
+//             asm!(
+//                 "mov sp, {linux_sp}",  // 将 Linux 上下文中的 sp 值设置到当前 sp
+//                 "mov x30, {linux_pc}",  // 将 Linux 上下文中的 pc 值设置到 x30
+//                 "mov sp, {guest_regs}", // 将 GuestRegisters 的地址设置为新的 sp
+//                 "str x30, [sp, #-16]", // 先保存 x30 到栈上的安全位置
+//                 restore_regs_from_stack!(), // 从栈上恢复寄存器状态
+//                 "ldr x30, [sp], #240",  // 从栈上恢复 x30
+//                 "br x30",  // 使用链接寄存器 x30 的值进行跳转
+//                 linux_sp = in(reg) linux.sp,
+//                 linux_pc = in(reg) linux.pc,
+//                 guest_regs = in(reg) self,
+//                 options(noreturn),
+//             );
+//         }
+//     }
+// }

@@ -6,17 +6,20 @@ pub const FP_SIMD_STATE_SIZE: usize = 512 + 16; // 浮点和 SIMD 寄存器大�
 #[repr(C)]
 pub struct FpSimdStateRegion {
     state: [u8; FP_SIMD_STATE_SIZE],
+    _reserved: [u8; 3369], 
 }
 
 impl FpSimdStateRegion {
     pub const fn new() -> Self {
         Self {
             state: [0; FP_SIMD_STATE_SIZE],
+            _reserved: [0; 3369], 
         }
     }
 
     pub fn restore(&self) {
         // 模拟 AArch64 恢复 FP/SIMD 状态的逻辑
+        // hahahah 
     }
 }
 

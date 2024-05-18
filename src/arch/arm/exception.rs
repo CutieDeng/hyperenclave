@@ -1,4 +1,8 @@
 pub mod ExceptionType {
+
+    pub const UndefinedInstruction: u8 = 35; 
+    pub const DataAbort: u8 = 36; 
+
     pub const SyncException: u8 = 0;
     pub const IRQ: u8 = 1;
     pub const FIQ: u8 = 2;
@@ -56,11 +60,18 @@ bitflags! {
     }
 }
 
+// #[derive(Copy, Clone, Debug)]
+// pub struct ExceptionInfo {
+//     pub exception_type: u8,
+//     pub error_code: Option<u32>,
+//     pub fault_address: Option<u64>,
+// }
+
 #[derive(Copy, Clone, Debug)]
 pub struct ExceptionInfo {
     pub exception_type: u8,
     pub error_code: Option<u32>,
-    pub fault_address: Option<u64>,
+    pub cr2: Option<u64>,
 }
 
 impl ExceptionInfo {
@@ -68,7 +79,7 @@ impl ExceptionInfo {
         ExceptionInfo {
             exception_type,
             error_code,
-            fault_address,
+            cr2: fault_address,
         }
     }
 }
@@ -76,6 +87,8 @@ impl ExceptionInfo {
 use core::arch::global_asm;
 
 use crate::arch::exception;
+
+use super::GuestRegisters;
 
 global_asm!(include_str!(concat!(env!("OUT_DIR"), "/exception.S")));
 
@@ -106,8 +119,51 @@ fn handle_serror() {
 fn handle_page_fault(frame: &ExceptionFrame) {
     panic!(
         "Unhandled hypervisor page fault @ {:#x?}, error_code={:#x}: {:#x?}",
-        frame.fault_address.unwrap_or(0),
-        frame.error_code.unwrap_or(0),
+        frame.rip, 
+        frame.error_code, 
         frame
     );
+}
+
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct ExceptionFrame {
+    // Pushed by `common_exception_entry`
+    regs: GuestRegisters,
+
+    // Pushed by 'exception.S'
+    num: usize,
+    error_code: usize,
+
+    // Pushed by CPU
+    rip: usize,
+    cs: usize,
+    rflags: usize,
+
+    rsp: usize,
+    ss: usize,
+}
+
+use core::arch::asm;
+
+#[naked]
+#[no_mangle]
+unsafe extern "C" fn common_exception_entry() -> ! {
+    asm!(
+        // 保存寄存器状态到栈上
+        save_regs_to_stack!(),
+        // 将栈指针 x28 (栈指针使用情况可能因实现而异) 的值移动到 x0 中
+        "mov x0, sp",
+        // 调用异常处理函数，x0 为参数
+        "bl {exception_handler}",
+        // 从栈上恢复寄存器状态
+        restore_regs_from_stack!(),
+        // 从栈上移除额外的信息 (ARM64 中可能需要根据异常类型和上下文调整)
+        "add sp, sp, #16",
+        // 从异常处理程序返回
+        "eret",
+        exception_handler = sym exception_handler,
+        options(noreturn),
+    )
 }

@@ -34,6 +34,7 @@ use crate::percpu::CpuState;
 pub type ElRange = Range<GuestVirtAddr>;
 
 bitflags! {
+    #[repr(C)]
     /// The ATTRIBUTES data structure is comprised of bit-granular fields that are used in the SECS.
     pub struct SgxAttributeFlags: u64 {
         /// This bit indicates if the enclave has been initialized by EINIT.
